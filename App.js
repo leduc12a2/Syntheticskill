@@ -1,112 +1,60 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React from 'react';
-import type {Node} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { HomeScreen, Calculator, Onboarding, TabRadio, DemoApp, ReadPaper, QuizApp, MyCV } from './src/screens'
+import { dataMainButton, height } from './src/utils';
+import { ButtonCustom } from './src/screens/QuizApp/QuizApp';
+import Icon from 'react-native-vector-icons/AntDesign'
+import { TouchableOpacity } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { cancelGame } from './src/redux/slice/GameSlice';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const Stack = createNativeStackNavigator();
+const StackDemoApp = createNativeStackNavigator();
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
+function StackDemoAppScreens(props) {
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    <StackDemoApp.Navigator initialRouteName="DemoAppScreen">
+      <StackDemoApp.Screen name="DemoAppScreen" component={DemoApp} />
+      <StackDemoApp.Screen name="ReadPaper" component={ReadPaper} />
+    </StackDemoApp.Navigator>
   );
-};
+}
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
+export default function App() {
+  const dispatch = useDispatch()
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default App;
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerTitleAlign: 'center' }}>
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        <Stack.Screen name="MyCV" component={MyCV} />
+        <Stack.Screen name="Calculator" component={Calculator} />
+        <Stack.Screen name="Onboarding" component={Onboarding} />
+        <Stack.Screen name="Tab Radio" component={TabRadio} />
+        <Stack.Screen name="DemoApp" component={StackDemoAppScreens}
+          options={() => ({
+            headerShown: false,
+            headerTitle: false,
+          })}
+        />
+        <Stack.Screen name="QuizApp" component={QuizApp}
+          options={(props) => ({
+            headerLeft: propsH => {
+              return (
+                <TouchableOpacity 
+                onPress={()=> {
+                    dispatch(cancelGame())
+                    props.navigation.goBack()
+                }}
+                {...propsH}
+                >
+                  <Icon name='back' size={30} />
+                </TouchableOpacity>
+              )
+            }
+          })}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  )
+}
